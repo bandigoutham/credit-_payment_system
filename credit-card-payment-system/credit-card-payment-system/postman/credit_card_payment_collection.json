@@ -1,0 +1,143 @@
+{
+  "info": {
+    "name": "Credit Card Payment System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "django_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "payment_url",
+      "value": "http://127.0.0.1:8001"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "url": "{{django_url}}/api/auth/register/",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\":\"demo_user\",\"email\":\"demo@example.com\",\"password\":\"Strong-Local-Password-123!\"}"
+        }
+      }
+    },
+    {
+      "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const d=pm.response.json(); if(d.access)pm.collectionVariables.set('access_token',d.access); if(d.refresh)pm.collectionVariables.set('refresh_token',d.refresh);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": "{{django_url}}/api/auth/login/",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\":\"demo_user\",\"password\":\"Strong-Local-Password-123!\"}"
+        }
+      }
+    },
+    {
+      "name": "Current user",
+      "request": {
+        "method": "GET",
+        "url": "{{django_url}}/api/auth/me/",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Add card reference",
+      "request": {
+        "method": "POST",
+        "url": "{{django_url}}/api/cards/",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"card_type\":\"VISA\",\"last4\":\"1234\",\"expiry_month\":12,\"expiry_year\":2028,\"provider_token\":\"demo-token-abc\"}"
+        }
+      }
+    },
+    {
+      "name": "Simulated payment",
+      "request": {
+        "method": "POST",
+        "url": "{{payment_url}}/api/payments/",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "demo-payment-0001"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"card_id\":1,\"amount\":\"499.00\",\"currency\":\"INR\",\"description\":\"Demo purchase\"}"
+        }
+      }
+    },
+    {
+      "name": "Transaction history",
+      "request": {
+        "method": "GET",
+        "url": "{{django_url}}/api/transactions/?status=SUCCESS",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ]
+      }
+    }
+  ]
+}

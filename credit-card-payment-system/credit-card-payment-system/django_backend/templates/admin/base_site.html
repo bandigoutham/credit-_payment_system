@@ -1,0 +1,12 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Stackly Payments{% endblock %}
+{% block branding %}
+<div id="site-name"><a href="{% url 'admin:index' %}">Stackly <span>Payments</span></a></div>
+{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/custom_admin.css' %}">
+{% endblock %}
